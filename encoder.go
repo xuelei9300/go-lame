@@ -1,8 +1,8 @@
 package lame
 
 import (
-	"io"
 	"errors"
+	"io"
 )
 
 // A helper for liblame, which is able to,
@@ -14,20 +14,25 @@ import (
 type (
 	// options for encoder
 	EncodeOptions struct {
-		InBigEndian bool // true if it is in big-endian
-		InSampleRate   int  // Hz, e.g., 8000, 16000, 12800, 44100, etc.
-		InBitsPerSample int // typically 16 should be working fine. the bit count of each sample, e.g., 2Bytes/sample->16bits
-		InNumChannels  int  // count of channels, for mono ones, please remain 1, and 2 if stereo
-
+		InBigEndian     bool // true if it is in big-endian
+		InSampleRate    int  // Hz, e.g., 8000, 16000, 12800, 44100, etc.
+		InBitsPerSample int  // typically 16 should be working fine. the bit count of each sample, e.g., 2Bytes/sample->16bits
+		InNumChannels   int  // count of channels, for mono ones, please remain 1, and 2 if stereo
 
 		OutSampleRate int  // Hz
 		OutMode       Mode // MODE_MONO, MODE_STEREO, etc.
 		OutQuality    int  // quality: 0-highest, 9-lowest
+
+		VbrMode           VBRMode // VBR_OFF, VBR_MTRH, VBR_MTHD, VBR_ABR
+		VbrMeanBitrateKps int     // only for VBR_ABR
+		VbrMinBitrateKps  int
+		VbrMaxBitrateKps  int
+		VbrQ              int
 	}
 
 	Writer struct {
 		output io.Writer
-		lame *Lame
+		lame   *Lame
 		EncodeOptions
 	}
 )
@@ -42,9 +47,9 @@ func NewWriter(output io.Writer) (*Writer, error) {
 	}
 	return &Writer{
 		output: output,
-		lame: lame,
+		lame:   lame,
 		EncodeOptions: EncodeOptions{
-			InBigEndian:  false,
+			InBigEndian:     false,
 			InSampleRate:    44100,
 			InBitsPerSample: 16,
 			InNumChannels:   2,
@@ -73,6 +78,22 @@ func (w *Writer) ForceUpdateParams() (err error) {
 	if err = w.lame.SetQuality(w.OutQuality); err != nil {
 		return
 	}
+	if err = w.lame.SetVBR(w.VbrMode); err != nil {
+		return
+	}
+	if err = w.lame.SetVBRMeanBitrateKbps(w.VbrMeanBitrateKps); err != nil {
+		return
+	}
+	if err = w.lame.SetVBRMinBitrateKbps(w.VbrMinBitrateKps); err != nil {
+		return
+	}
+	if err = w.lame.SetVBRMaxBitrateKbps(w.VbrMaxBitrateKps); err != nil {
+		return
+	}
+	if err = w.lame.SetVBRQ(w.VbrQ); err != nil {
+		return
+	}
+
 	if err = w.lame.InitParams(); err != nil {
 		return
 	}
@@ -90,13 +111,13 @@ func (w *Writer) Write(p []byte) (n int, err error) {
 		}
 	}
 
-	var samples = make([]int16, len(p) / 2)
+	var samples = make([]int16, len(p)/2)
 	var lo, hi int16 = 0x0001, 0x0100
 	if w.InBigEndian {
 		lo, hi = 0x0100, 0x0001
 	}
 	for i := 0; i < len(samples); i++ {
-		samples[i] = int16(p[i * 2]) * lo + int16(p[i * 2 + 1]) * hi
+		samples[i] = int16(p[i*2])*lo + int16(p[i*2+1])*hi
 	}
 	var outNumChannels = 2
 	if w.OutMode == MODE_MONO {
@@ -104,7 +125,7 @@ func (w *Writer) Write(p []byte) (n int, err error) {
 	}
 	// inSample * (inRate / outRate) / (inNumChan / outNumChan)
 	var outSampleCount = int(int64(len(samples)) * int64(w.InSampleRate) / int64(w.OutSampleRate) * int64(outNumChannels) / int64(w.InNumChannels))
-	var mp3BufSize = int(1.25 * float32(outSampleCount) + 7200) // follow the instruction from LAME
+	var mp3BufSize = int(1.25*float32(outSampleCount) + 7200) // follow the instruction from LAME
 	var mp3Buf = make([]byte, mp3BufSize)
 
 	if w.InNumChannels != 1 && w.InNumChannels != 2 {
