@@ -1,9 +1,10 @@
 package examples
 
 import (
-	"os"
 	"io"
-	"github.com/sunicy/go-lame"
+	"os"
+
+	"github.com/furick/go-lame"
 )
 
 func PcmToMp3(pcmFileName, mp3FileName string) {
@@ -26,10 +27,10 @@ func PcmToMp3Customize(pcmFileName, mp3FileName string) {
 	if err != nil {
 		panic("cannot create lame writer, err: " + err.Error())
 	}
-	wr.InSampleRate = 44100  // input sample rate
-	wr.InNumChannels = 1     // number of channels: 1
+	wr.InSampleRate = 44100       // input sample rate
+	wr.InNumChannels = 1          // number of channels: 1
 	wr.OutMode = lame.MODE_STEREO // common, 2 channels
-	wr.OutQuality = 9        // 0: highest; 9: lowest
+	wr.OutQuality = 9             // 0: highest; 9: lowest
 	wr.OutSampleRate = 8000
 	io.Copy(wr, pcmFile)
 	wr.Close()

@@ -1,14 +1,15 @@
 package lame
 
 import (
-	"testing"
 	"os"
-	"./compare"
+	"testing"
+
+	"github.com/furick/go-lame/compare"
 )
 
 func Test_ReadWavHeader(t *testing.T) {
 	tests := []struct {
-		fn string
+		fn  string
 		hdr WavHeader
 	}{
 		{
@@ -60,4 +61,3 @@ func Test_LameStruct(t *testing.T) {
 	t.Logf("%#v", l.lgs)
 	t.Logf("%#v", err)
 }
-
