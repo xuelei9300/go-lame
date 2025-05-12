@@ -22,12 +22,6 @@ type (
 		OutSampleRate int  // Hz
 		OutMode       Mode // MODE_MONO, MODE_STEREO, etc.
 		OutQuality    int  // quality: 0-highest, 9-lowest
-
-		VbrMode           VBRMode // VBR_OFF, VBR_MTRH, VBR_MTHD, VBR_ABR
-		VbrMeanBitrateKps int     // only for VBR_ABR
-		VbrMinBitrateKps  int
-		VbrMaxBitrateKps  int
-		VbrQ              int
 	}
 
 	Writer struct {
@@ -78,26 +72,39 @@ func (w *Writer) ForceUpdateParams() (err error) {
 	if err = w.lame.SetQuality(w.OutQuality); err != nil {
 		return
 	}
-	if err = w.lame.SetVBR(w.VbrMode); err != nil {
-		return
-	}
-	if err = w.lame.SetVBRMeanBitrateKbps(w.VbrMeanBitrateKps); err != nil {
-		return
-	}
-	if err = w.lame.SetVBRMinBitrateKbps(w.VbrMinBitrateKps); err != nil {
-		return
-	}
-	if err = w.lame.SetVBRMaxBitrateKbps(w.VbrMaxBitrateKps); err != nil {
-		return
-	}
-	if err = w.lame.SetVBRQ(w.VbrQ); err != nil {
-		return
-	}
 
 	if err = w.lame.InitParams(); err != nil {
 		return
 	}
 	return nil
+}
+
+func (w *Writer) SetVbrMode(vbrMode VBRMode) error {
+	return w.lame.SetVBR(vbrMode)
+}
+
+func (w *Writer) SetVbrMeanBitrateKps(vbrMeanBitrateKps int) error {
+	return w.lame.SetVBRMeanBitrateKbps(vbrMeanBitrateKps)
+}
+
+func (w *Writer) SetVbrMinBitrateKps(vbrMinBitrateKps int) error {
+	return w.lame.SetVBRMinBitrateKbps(vbrMinBitrateKps)
+}
+
+func (w *Writer) SetVbrMaxBitrateKps(vbrMaxBitrateKps int) error {
+	return w.lame.SetVBRMaxBitrateKbps(vbrMaxBitrateKps)
+}
+
+func (w *Writer) SetVbrQ(vbrQ int) error {
+	return w.lame.SetVBRQ(vbrQ)
+}
+
+func (w *Writer) SetBrate(brate int) error {
+	return w.lame.SetVBRMeanBitrateKbps(brate)
+}
+
+func (w *Writer) SetCompressionRatio(compressionRatio float32) error {
+	return w.lame.SetCompressionRatio(compressionRatio)
 }
 
 // NOT thread-safe!
