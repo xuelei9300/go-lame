@@ -148,7 +148,7 @@ func (w *Writer) Write(p []byte) (n int, err error) {
 	}
 	// inSample * (inRate / outRate) / (inNumChan / outNumChan)
 	var outSampleCount = int(int64(len(samples)) * int64(w.InSampleRate) / int64(w.OutSampleRate) * int64(outNumChannels) / int64(w.InNumChannels))
-	var mp3BufSize = int(1.25*float32(outSampleCount) + 7200) // follow the instruction from LAME
+	var mp3BufSize = int(1.25*float32(outSampleCount) + 1152) // 减少缓冲区大小以降低延迟
 	var mp3Buf = make([]byte, mp3BufSize)
 
 	if w.InNumChannels != 1 && w.InNumChannels != 2 {
