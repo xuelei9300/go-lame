@@ -100,7 +100,7 @@ func (w *Writer) SetVbrQ(vbrQ int) error {
 }
 
 func (w *Writer) SetBrate(brate int) error {
-	return w.lame.SetVBRMeanBitrateKbps(brate)
+	return w.lame.SetBrate(brate)
 }
 
 func (w *Writer) SetCompressionRatio(compressionRatio float32) error {
@@ -113,6 +113,14 @@ func (w *Writer) SetNogapTotal(nogapTotal int) error {
 
 func (w *Writer) SetNogapCurrentindex(index int) error {
 	return w.lame.SetNogapCurrentindex(index)
+}
+
+func (w *Writer) SetHighpassfreq(highpassfreq int) error {
+	return w.lame.SetHighpassfreq(highpassfreq)
+}
+
+func (w *Writer) SetLowpassfreq(lowpassfreq int) error {
+	return w.lame.SetLowpassfreq(lowpassfreq)
 }
 
 // NOT thread-safe!
