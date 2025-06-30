@@ -107,6 +107,14 @@ func (w *Writer) SetCompressionRatio(compressionRatio float32) error {
 	return w.lame.SetCompressionRatio(compressionRatio)
 }
 
+func (w *Writer) SetNogapTotal(nogapTotal int) error {
+	return w.lame.SetNogapTotal(nogapTotal)
+}
+
+func (w *Writer) SetNogapCurrentindex(index int) error {
+	return w.lame.SetNogapCurrentindex(index)
+}
+
 // NOT thread-safe!
 // will check if we have lame object inside first!
 // TODO: support 8bit/32bit!
