@@ -4,7 +4,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/furick/go-lame"
+	"github.com/xuelei9300/go-lame"
 )
 
 func WavToMp3(wavFileName, mp3FileName string) {
